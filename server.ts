@@ -28,7 +28,7 @@ async function handle(
     const url = coll[id];
     log.info(`Loading from ${url}`);
 
-    if (url) {
+    if (!url) {
       return ["", 404];
     }
 
@@ -38,6 +38,7 @@ async function handle(
       const writableStream = writableStreamFromWriter(file);
       await resp.body?.pipeTo(writableStream);
     } catch (e) {
+      log.error(`Could not find data for ${id} at ${url}`);
       return ["", 404];
     }
   }
