@@ -1,7 +1,14 @@
-import { Application, Router } from "https://deno.land/x/oak/mod.ts";
+import {
+  Application,
+  Router,
+  send,
+  Context,
+} from "https://deno.land/x/oak/mod.ts";
 import { mappings } from "./icons.ts";
 import { exists, ensureDir } from "https://deno.land/std/fs/mod.ts";
-import * as log from "https://deno.land/std/log/mod.ts";
+import { writableStreamFromWriter } from "https://deno.land/std@0.151.0/streams/mod.ts";
+
+import * as log from "https://deno.land/std@0.151.0/log/mod.ts";
 
 const port = 6969;
 
@@ -20,40 +27,34 @@ async function handle(
   if (!fileExists) {
     const url = coll[id];
     log.info(`Loading from ${url}`);
-    const resp = await fetch(url);
-    const body = await resp.text();
-    await Deno.writeTextFile(fname, body);
+
+    if (url) {
+      const resp = await fetch(url);
+
+      if (resp.status === 200) {
+        const file = await Deno.open(fname, { write: true, create: true });
+        const writableStream = writableStreamFromWriter(file);
+        await resp.body?.pipeTo(writableStream);
+      }
+    }
   }
 
-  return await Deno.readTextFile(fname);
+  return fname;
 }
+
+const createHandler = (coll: Record<string, string>, folder: string) => {
+  return async (context: Context<any>) => {
+    const ctx = context as Record<string, any>;
+    const fname = await handle(coll, folder, ctx?.params?.id);
+    await send(context, fname);
+  };
+};
 
 const router = new Router();
 router
-  .get("/trait/:id", async (context) => {
-    context.response.body = await handle(
-      mappings.traits,
-      "traits",
-      context?.params?.id
-    );
-    context.response.type = "image/png";
-  })
-  .get("/champion/:id", async (context) => {
-    context.response.body = await handle(
-      mappings.champions,
-      "champions",
-      context?.params?.id
-    );
-    context.response.type = "image/png";
-  })
-  .get("/item/:id", async (context) => {
-    context.response.body = await handle(
-      mappings.items,
-      "items",
-      context?.params?.id
-    );
-    context.response.type = "image/png";
-  });
+  .get("/champion/:id", createHandler(mappings.champions, "champions"))
+  .get("/trait/:id", createHandler(mappings.traits, "traits"))
+  .get("/items/:id", createHandler(mappings.items, "items"));
 
 const app = new Application();
 app.use(router.routes());

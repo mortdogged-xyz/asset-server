@@ -31,7 +31,7 @@ function toMappings(acc: Record<string, string>, item: DataItem) {
 }
 
 function toMappingsChamp(acc: Record<string, string>, item: DataItem) {
-  acc[item.name] = icon2Src(championIcon(item.icon));
+  acc[item.name] = icon2Src(championIcon(item.apiName));
   return acc;
 }
 
@@ -56,5 +56,5 @@ function icon2Src(icon: string): string {
 export const mappings: Mappings = {
   items: rawData.items.reduce(toMappings, {}),
   traits: rawData.sets[SetNumber].traits.reduce(toMappings, {}),
-  champions: rawData.sets[SetNumber].champions.reduce(toMappings, {}),
+  champions: rawData.sets[SetNumber].champions.reduce(toMappingsChamp, {}),
 };
