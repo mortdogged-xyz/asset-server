@@ -61,6 +61,7 @@ const createHandler = (coll: Record<string, string>, folder: string) => {
 const router = new Router();
 router
   .get("/champion/:id", createHandler(mappings.champions, "champions"))
+  .get("/championL/:id", createHandler(mappings.championsL, "championsL"))
   .get("/trait/:id", createHandler(mappings.traits, "traits"))
   .get("/item/:id", createHandler(mappings.items, "items"));
 

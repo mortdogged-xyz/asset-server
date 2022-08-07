@@ -22,6 +22,7 @@ interface RawData {
 interface Mappings {
   items: Record<string, string>;
   traits: Record<string, string>;
+  championsL: Record<string, string>;
   champions: Record<string, string>;
 }
 
@@ -56,5 +57,6 @@ function icon2Src(icon: string): string {
 export const mappings: Mappings = {
   items: rawData.items.reduce(toMappings, {}),
   traits: rawData.sets[SetNumber].traits.reduce(toMappings, {}),
+  championsL: rawData.sets[SetNumber].champions.reduce(toMappings, {}),
   champions: rawData.sets[SetNumber].champions.reduce(toMappingsChamp, {}),
 };
