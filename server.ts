@@ -62,7 +62,7 @@ const router = new Router();
 router
   .get("/champion/:id", createHandler(mappings.champions, "champions"))
   .get("/trait/:id", createHandler(mappings.traits, "traits"))
-  .get("/items/:id", createHandler(mappings.items, "items"));
+  .get("/item/:id", createHandler(mappings.items, "items"));
 
 const app = new Application();
 app.use(router.routes());
