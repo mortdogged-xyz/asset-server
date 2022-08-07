@@ -16,7 +16,7 @@ async function handle(
   coll: Record<string, string>,
   folder: string,
   id: string
-): Promise<string> {
+): Promise<[string, number]> {
   log.info(`Fetching ${folder}/${id}`);
   const storagePath = `storage/${folder}`;
   await ensureDir(storagePath);
@@ -29,24 +29,31 @@ async function handle(
     log.info(`Loading from ${url}`);
 
     if (url) {
-      const resp = await fetch(url);
+      return ["", 404];
+    }
 
-      if (resp.status === 200) {
-        const file = await Deno.open(fname, { write: true, create: true });
-        const writableStream = writableStreamFromWriter(file);
-        await resp.body?.pipeTo(writableStream);
-      }
+    try {
+      const resp = await fetch(url);
+      const file = await Deno.open(fname, { write: true, create: true });
+      const writableStream = writableStreamFromWriter(file);
+      await resp.body?.pipeTo(writableStream);
+    } catch (e) {
+      return ["", 404];
     }
   }
 
-  return fname;
+  return [fname, 200];
 }
 
 const createHandler = (coll: Record<string, string>, folder: string) => {
   return async (context: Context<any>) => {
     const ctx = context as Record<string, any>;
-    const fname = await handle(coll, folder, ctx?.params?.id);
-    await send(context, fname);
+    const [fname, status] = await handle(coll, folder, ctx?.params?.id);
+    context.response.status = status;
+
+    if (status === 200) {
+      await send(context, fname);
+    }
   };
 };
 
