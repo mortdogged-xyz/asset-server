@@ -36,11 +36,19 @@ function toMappingsChamp(acc: Record<string, string>, item: DataItem) {
   return acc;
 }
 
+const champMapping: Record<string, string> = {
+  tft7_dragonblue: "tft7_miragedragon",
+  tft7_dragongold: "tft7_shimmerscaledragon",
+  tft7_dragongreen: "tft7_jadedragon",
+  tft7_dragonpurple: "tft7_whispersdragon",
+};
+
 function championIcon(apiName: string): string {
   const an = apiName.toLowerCase();
+  let san = champMapping[an] || an;
   const sn = CurrentSet.toLowerCase();
 
-  return `assets/characters/${an}/hud/${an}_square.${sn}.png`;
+  return `assets/characters/${an}/hud/${san}_square.${sn}.png`;
 }
 
 function icon2Src(icon: string): string {
