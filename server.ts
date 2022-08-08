@@ -34,9 +34,11 @@ async function handle(
 
     try {
       const resp = await fetch(url);
-      const file = await Deno.open(fname, { write: true, create: true });
-      const writableStream = writableStreamFromWriter(file);
-      await resp.body?.pipeTo(writableStream);
+      if (resp.status === 200) {
+        const file = await Deno.open(fname, { write: true, create: true });
+        const writableStream = writableStreamFromWriter(file);
+        await resp.body?.pipeTo(writableStream);
+      }
     } catch (e) {
       log.error(`Could not find data for ${id} at ${url}`);
       return ["", 404];
