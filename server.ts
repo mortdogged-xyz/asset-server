@@ -51,7 +51,11 @@ async function handle(
 const createHandler = (coll: Record<string, string>, folder: string) => {
   return async (context: Context<any>) => {
     const ctx = context as Record<string, any>;
-    const [fname, status] = await handle(coll, folder, ctx?.params?.id);
+    const [fname, status] = await handle(
+      coll,
+      folder,
+      ctx?.params?.id?.toLowerCase()
+    );
     context.response.status = status;
 
     if (status === 200) {

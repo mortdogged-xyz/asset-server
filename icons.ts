@@ -27,12 +27,18 @@ interface Mappings {
 }
 
 function toMappings(acc: Record<string, string>, item: DataItem) {
-  acc[item.name] = icon2Src(item.icon);
+  const icon = icon2Src(item.icon);
+  acc[item.name?.toLowerCase()] = icon;
+  acc[item.apiName?.toLowerCase()] = icon;
+
   return acc;
 }
 
 function toMappingsChamp(acc: Record<string, string>, item: DataItem) {
-  acc[item.name] = icon2Src(championIcon(item.apiName));
+  const icon = icon2Src(championIcon(item.apiName));
+  acc[item.name?.toLowerCase()] = icon;
+  acc[item.apiName?.toLowerCase()] = icon;
+
   return acc;
 }
 
